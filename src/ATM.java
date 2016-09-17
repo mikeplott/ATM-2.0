@@ -11,13 +11,21 @@ public class ATM {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean stillRun = true;
+        System.out.println("Welcome to the ATM");
+        System.out.println("/admin will print out all users accounts");
         while (stillRun) {
             System.out.println("Please enter your username");
             String username = scanner.nextLine();
+            if (username.startsWith("/")) {
+                System.out.println("Invalid username");
+                main(args);
+            }
             if (users.get(username) == null) {
                 System.out.println("User does not exist, would you like to create an account? Press y or n");
                 String choice = scanner.nextLine();
                 if (choice.equalsIgnoreCase("n")) {
+                    main(args);
+                } else if (!choice.equalsIgnoreCase("y")) {
                     main(args);
                 }
                 System.out.println("Please enter a password");
@@ -27,20 +35,23 @@ public class ATM {
                 scanner.nextLine();
                 User user = new User(username, password, myBalance);
                 users.put(user.name, user);
+                if (choice.equalsIgnoreCase("/admin")) {
+                    System.out.println(users.get(user.name).balance);
+                }
             }
             System.out.println("Please enter your password");
             String userPass = scanner.nextLine();
             if (userPass.equalsIgnoreCase(users.get(username).pass)) {
-            boolean isLoggedIn = true;
-            while (isLoggedIn) {
-                User user = users.get(username);
-
+                boolean isLoggedIn = true;
+                while (isLoggedIn) {
+                    User user = users.get(username);
                     System.out.println("Welcome " + user.name + "!");
                     System.out.println("1: Check Balance");
                     System.out.println("2: Make Withdraw");
-                    System.out.println("3: Logout");
-                    System.out.println("4: Remove Account");
-                    System.out.println("5: Quit");
+                    System.out.println("3: Make Deposit");
+                    System.out.println("4: Logout");
+                    System.out.println("5: Remove Account");
+                    System.out.println("6: Quit");
                     String choice1 = scanner.nextLine();
                     if (choice1.equalsIgnoreCase("1")) {
                         System.out.println("Your balance is: $" + user.balance);
@@ -50,28 +61,40 @@ public class ATM {
                         if (Integer.parseInt(withdraw) > user.balance) {
                             System.out.println("You too broke biatch!");
                         } else {
-                            user.balance = user.balance - Integer.parseInt(withdraw);
+                            user.balance -= Integer.parseInt(withdraw);
                             System.out.println("Please take your money");
                             System.out.println("Your new balance is: $" + user.balance);
                         }
-                    } else if (choice1.equalsIgnoreCase("3")) {
+                    } else if (choice1.equalsIgnoreCase("4")) {
                         isLoggedIn = false;
                         main(args);
-                    } else if (choice1.equalsIgnoreCase("4")) {
+                    } else if (choice1.equalsIgnoreCase("5")) {
                         System.out.println("Are you really sure you would like to remove your account? Press y or n");
                         String choice = scanner.nextLine();
                         if (choice.equalsIgnoreCase("y")) {
                             users.remove(user.name);
                             main(args);
                         }
-                    } else if (choice1.equalsIgnoreCase("5")) {
+                    } else if (choice1.equalsIgnoreCase("6")) {
                         System.exit(0);
+                    } else if (choice1.equalsIgnoreCase("3")) {
+                        System.out.println("Please enter deposit amount");
+                        String deposit = scanner.nextLine();
+                        user.balance = user.balance + Integer.parseInt(deposit);
+                        System.out.println("Your new balance is: $" + user.balance);
+                    } else if (choice1.equalsIgnoreCase("/admin")) {
+                        for (String key : users.keySet()) {
+                            System.out.println("Username: " + users.get(key).name +
+                                    "," + " " + "Password: " + "" + users.get(key).pass +
+                                    "," + " " + "Balance: " + "" + users.get(key).balance);
+                        }
+                            main(args);
+                    }
+                    else {
+                        System.out.println("Password incorrect!");
+                        main(args);
                     }
                 }
-            }
-            else {
-                System.out.println("Password incorrect!");
-                main(args);
             }
         }
     }
